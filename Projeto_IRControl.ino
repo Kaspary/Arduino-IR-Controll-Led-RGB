@@ -52,11 +52,8 @@ void loop() {
       }
       case(0xFFE21D):{
         //3 (Inicia o loop por todas as cores, ou para o loop)
-        Serial.println("AQUIII");
-        Serial.println(set_color);
         go_colors = !go_colors;
         set_color = false;
-        Serial.println(go_colors);
         red = 0;
         green = 0;
         blue = 255;
@@ -102,7 +99,6 @@ void loop() {
         break;
       }
     }
-    Serial.println(set_color);
     if(set_color){
       setColor(response.value);
     }
