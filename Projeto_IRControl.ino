@@ -29,7 +29,7 @@ void setup() {
   pinMode(GREEN, OUTPUT);
   pinMode(BLUE, OUTPUT);
   pinMode(RED, OUTPUT);
-  pinMode(BUZZER, OUTPUT);
+//  pinMode(BUZZER, OUTPUT);
   //Inicia o rele com o estado normal dele, evita que a lampada desligue quando inicia
   digitalWrite(LAMP, HIGH);
 }
@@ -110,7 +110,7 @@ void loop() {
   }
   if (go_colors) {
     goColors(1);
-    delay(150);
+    delay(50);
   }
 }
 
