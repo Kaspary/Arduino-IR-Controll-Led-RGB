@@ -2,7 +2,7 @@
 
 #define CONTROL 8
 #define LAMP 9
-#define BUZZER 0
+//#define BUZZER 0
 #define RED 3
 #define GREEN 5
 #define BLUE 6
