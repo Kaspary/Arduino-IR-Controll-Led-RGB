@@ -2,7 +2,7 @@
 
 #define CONTROL 8
 #define LAMP 9
-//#define BUZZER 0
+#define BUZZER 10
 #define RED 3
 #define GREEN 5
 #define BLUE 6
@@ -29,7 +29,7 @@ void setup() {
   pinMode(GREEN, OUTPUT);
   pinMode(BLUE, OUTPUT);
   pinMode(RED, OUTPUT);
-//  pinMode(BUZZER, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
   //Inicia o rele com o estado normal dele, evita que a lampada desligue quando inicia
   digitalWrite(LAMP, HIGH);
 }
@@ -40,23 +40,27 @@ void loop() {
     switch (response.value) {
       case (0xFFA25D): {
           //1 (Liga ou desliga a lampada)
+          buzzer(true);
           digitalWrite(LAMP, !digitalRead(LAMP));
           break;
         }
       case (0xFF629D): {
           //2 (Inicia o modo para ajustar a cor, ou sai do mesmo)
+          buzzer(!set_color);
           set_color = !set_color;
           go_colors = false;
           break;
         }
       case (0xFFE21D): {
           //3 (Inicia o loop por todas as cores, ou para o loop)
+          buzzer(!go_colors);
           go_colors = !go_colors;
           set_color = false;
           break;
         }
       case (0xFF22DD): {
           //4 (Seta a cor branca)
+          buzzer(true);
           go_colors = false;
           set_color = false;
           rgb(255, 255, 255);
@@ -64,6 +68,7 @@ void loop() {
         }
       case (0xFF02FD): {
           //5 (Desliga todos os leds)
+          buzzer(false);
           go_colors = false;
           set_color = false;
           rgb(0, 0, 0);
@@ -75,6 +80,7 @@ void loop() {
         }
       case (0xFFB04F): {
           //#
+          buzzer(true);
           Serial.println("CURTO-CIRCUITO");
           for (int i = 0; i < 100; i++) {
             rgb(255, 0, 0);
@@ -93,6 +99,7 @@ void loop() {
         }
       case (0xFF6897): {
           //* (Desliga todas as luzes - modo sleep)
+          buzzer(false);
           go_colors = false;
           set_color = false;
           color_up = false;
@@ -129,9 +136,34 @@ void goColors(float x) {
   } else if (blue == 255 && green - x >= 0 && green - x <= 255 && red == 0) {
     green -= x;
   } else if (red > 0 && green > 0 && blue > 0) {
-    green = 0;
+    green -= x;
   } else if (red < 255 && green < 255 && blue < 255) {
-    blue = 255;
+    blue += x;
+  }
+  rgb(red, green, blue);
+  printColors();
+}
+
+
+void brightness(float x){
+//  float current_state = 
+  if (red + x <= 255 && red > 0) {
+    red += x;
+  }
+  if (green + x <= 255 && green > 0) {
+    green += x;
+  }
+  if (blue + x <= 255 && blue > 0) {
+    blue += x;
+  }
+  if (red - x > 0) {
+    red -= x;
+  }
+  if (green - x > 0) {
+    green -= x;
+  }
+  if (blue - x > 0) {
+    blue -= x;
   }
   rgb(red, green, blue);
 }
@@ -171,27 +203,17 @@ void setColor(long comand) {
   } else if (color_left) {
     goColors(-number_run);
   } else if (color_up) {
-    if (red + number_run <= 255 && red > 0) {
-      red += number_run;
-    }
-    if (green + number_run <= 255 && green > 0) {
-      green += number_run;
-    }
-    if (blue + number_run <= 255 && blue > 0) {
-      blue += number_run;
-    }
-    rgb(red, green, blue);
+    brightness(number_run);
   } else if (color_down) {
-    if (red - number_run > 0) {
-      red -= number_run;
-    }
-    if (green - number_run > 0) {
-      green -= number_run;
-    }
-    if (blue - number_run > 0) {
-      blue -= number_run;
-    }
-    rgb(red, green, blue);
+    brightness(-number_run);
+  }
+}
+
+void buzzer(boolean x){
+  if(x){
+    tone(BUZZER, 800, 50);
+  }else{
+    tone(BUZZER, 1000, 50);    
   }
 }
 
